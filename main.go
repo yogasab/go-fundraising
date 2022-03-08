@@ -2,7 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"go-fundraising/entity"
+	"go-fundraising/handler"
+	"go-fundraising/repository"
+	"go-fundraising/service"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -22,9 +27,22 @@ func main() {
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
-	_, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 	fmt.Println("Database connected")
+	db.AutoMigrate(&entity.User{})
+
+	userRepository := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
+
+	router := gin.Default()
+
+	userRouter := router.Group("/api/v1/users")
+	{
+		userRouter.POST("/register", userHandler.RegisterUser)
+	}
+	router.Run(":5000")
 }
