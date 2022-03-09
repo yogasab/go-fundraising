@@ -43,6 +43,7 @@ func main() {
 	userRouter := router.Group("/api/v1/users")
 	{
 		userRouter.POST("/register", userHandler.RegisterUser)
+		userRouter.POST("/login", userHandler.LoginUser)
 	}
 	router.Run(":5000")
 }

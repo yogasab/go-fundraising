@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"go-fundraising/dto"
 	"go-fundraising/entity"
 	"go-fundraising/repository"
@@ -10,6 +11,7 @@ import (
 
 type UserService interface {
 	RegisterUser(request dto.RegisterRequest) (entity.User, error)
+	LoginUser(request dto.LoginRequest) (entity.User, error)
 }
 
 type userService struct {
@@ -39,4 +41,24 @@ func (s *userService) RegisterUser(request dto.RegisterRequest) (entity.User, er
 		return user, nil
 	}
 	return newUser, nil
+}
+
+func (s *userService) LoginUser(request dto.LoginRequest) (entity.User, error) {
+	email := request.Email
+	password := request.Password
+
+	user, err := s.userRepository.FindByEmail(email)
+	if err != nil {
+		return user, errors.New("User with correspond email is not registered")
+	}
+	if user.ID == 0 {
+		return user, errors.New("User with correspond email is not registered")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return user, errors.New("Invalid credentials check your email or password")
+	}
+
+	return user, nil
 }
