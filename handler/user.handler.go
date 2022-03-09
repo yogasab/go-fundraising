@@ -11,6 +11,7 @@ import (
 type UserHandler interface {
 	RegisterUser(ctx *gin.Context)
 	LoginUser(ctx *gin.Context)
+	CheckEmailAvaibility(ctx *gin.Context)
 }
 
 type userHandler struct {
@@ -62,5 +63,33 @@ func (h *userHandler) LoginUser(ctx *gin.Context) {
 	}
 
 	response := helper.APIResponse("User login successfully", http.StatusOK, "sucess", user)
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) CheckEmailAvaibility(ctx *gin.Context) {
+	var request dto.CheckEmailRequest
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		errors := helper.FormatValidationErrors(err)
+		errorMessage := gin.H{"errors": errors}
+		response := helper.APIResponse("Failed to process request", http.StatusUnprocessableEntity, "failed", errorMessage)
+		ctx.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+	isEmailAvailable, err := h.userService.CheckEmailAvailability(request)
+	if err != nil {
+		errorMessage := gin.H{"errors": "Error on finding user email"}
+		response := helper.APIResponse("Failed to process request", http.StatusUnprocessableEntity, "failed", errorMessage)
+		ctx.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+	data := gin.H{
+		"is_available": isEmailAvailable,
+	}
+	metaMessage := "Email is already registered, please try another"
+	if isEmailAvailable {
+		metaMessage = "Email is available you can continue the registration"
+	}
+	response := helper.APIResponse(metaMessage, http.StatusOK, "success", data)
 	ctx.JSON(http.StatusOK, response)
 }

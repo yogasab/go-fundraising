@@ -12,6 +12,7 @@ import (
 type UserService interface {
 	RegisterUser(request dto.RegisterRequest) (entity.User, error)
 	LoginUser(request dto.LoginRequest) (entity.User, error)
+	CheckEmailAvailability(request dto.CheckEmailRequest) (bool, error)
 }
 
 type userService struct {
@@ -61,4 +62,20 @@ func (s *userService) LoginUser(request dto.LoginRequest) (entity.User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *userService) CheckEmailAvailability(request dto.CheckEmailRequest) (bool, error) {
+	email := request.Email
+
+	user, err := s.userRepository.FindByEmail(email)
+	if err != nil {
+		return false, err
+	}
+
+	// Check if user is available through default value of ID
+	if user.ID == 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

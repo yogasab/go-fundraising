@@ -33,7 +33,7 @@ func (r *userRepository) Save(user entity.User) (entity.User, error) {
 func (r *userRepository) FindByEmail(email string) (entity.User, error) {
 	// Which table we query on
 	var user entity.User
-	err := r.db.Where("email = ?", email).Take(&user).Error
+	err := r.db.Where("email = ?", email).Find(&user).Error
 	if err != nil {
 		log.Println(err.Error())
 		return user, err
