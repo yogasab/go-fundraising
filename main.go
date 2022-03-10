@@ -45,6 +45,8 @@ func main() {
 		userRouter.POST("/register", userHandler.RegisterUser)
 		userRouter.POST("/login", userHandler.LoginUser)
 		userRouter.POST("/check-email", userHandler.CheckEmailAvaibility)
+		userRouter.POST("/avatars", userHandler.UploadAvatar)
+
 	}
 	router.Run(":5000")
 }

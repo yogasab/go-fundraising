@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-fundraising/dto"
 	"go-fundraising/helper"
@@ -12,6 +13,7 @@ type UserHandler interface {
 	RegisterUser(ctx *gin.Context)
 	LoginUser(ctx *gin.Context)
 	CheckEmailAvaibility(ctx *gin.Context)
+	UploadAvatar(ctx *gin.Context)
 }
 
 type userHandler struct {
@@ -91,5 +93,28 @@ func (h *userHandler) CheckEmailAvaibility(ctx *gin.Context) {
 		metaMessage = "Email is available you can continue the registration"
 	}
 	response := helper.APIResponse(metaMessage, http.StatusOK, "success", data)
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) UploadAvatar(ctx *gin.Context) {
+	file, err := ctx.FormFile("avatar")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Error on upload avatar", http.StatusBadRequest, "failed", data)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	userID := 1
+	destination := fmt.Sprintf("images/avatars/%d-%s", userID, file.Filename)
+	err = ctx.SaveUploadedFile(file, destination)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse(err.Error(), http.StatusBadRequest, "failed", data)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	_, err = h.userService.SaveAvatar(16, destination)
+	data := gin.H{"is_uploaded": true}
+	response := helper.APIResponse("Avatar uploaded successfully", http.StatusOK, "success", data)
 	ctx.JSON(http.StatusOK, response)
 }
