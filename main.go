@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
 	"go-fundraising/repository"
 	"go-fundraising/service"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -35,8 +36,11 @@ func main() {
 	db.AutoMigrate(&entity.User{})
 
 	userRepository := repository.NewUserRepository(db)
+
+	jwtService := service.NewJWTService()
 	userService := service.NewUserService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
+
+	userHandler := handler.NewUserHandler(userService, jwtService)
 
 	router := gin.Default()
 

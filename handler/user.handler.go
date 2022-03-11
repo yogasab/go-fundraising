@@ -18,10 +18,11 @@ type UserHandler interface {
 
 type userHandler struct {
 	userService service.UserService
+	jwtService  service.JWTService
 }
 
-func NewUserHandler(userService service.UserService) UserHandler {
-	return &userHandler{userService: userService}
+func NewUserHandler(userService service.UserService, jwtService service.JWTService) UserHandler {
+	return &userHandler{userService: userService, jwtService: jwtService}
 }
 
 func (h *userHandler) RegisterUser(ctx *gin.Context) {
@@ -40,7 +41,13 @@ func (h *userHandler) RegisterUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	userResponse := helper.FormatUser(user, "fafifu")
+	jwtToken, err := h.jwtService.GenerateToken(user.ID)
+	if err != nil {
+		response := helper.APIResponse("Register user failed", http.StatusBadRequest, err.Error(), nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	userResponse := helper.FormatUser(user, jwtToken)
 	response := helper.APIResponse("User registered successfully", http.StatusCreated, "success", userResponse)
 	ctx.JSON(http.StatusCreated, response)
 }
@@ -64,7 +71,15 @@ func (h *userHandler) LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("User login successfully", http.StatusOK, "sucess", user)
+	jwtToken, err := h.jwtService.GenerateToken(user.ID)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := helper.APIResponse("Login user failed", http.StatusBadRequest, "failed", errorMessage)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	userResponse := helper.FormatUser(user, jwtToken)
+	response := helper.APIResponse("User login successfully", http.StatusOK, "success", userResponse)
 	ctx.JSON(http.StatusOK, response)
 }
 
