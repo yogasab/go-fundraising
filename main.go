@@ -34,7 +34,7 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 	fmt.Println("Database connected")
-	db.AutoMigrate(&entity.User{})
+	db.AutoMigrate(&entity.User{}, &entity.Campaign{}, &entity.CampaignImage{})
 
 	userRepository := repository.NewUserRepository(db)
 
