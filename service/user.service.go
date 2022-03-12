@@ -14,6 +14,7 @@ type UserService interface {
 	LoginUser(request dto.LoginRequest) (entity.User, error)
 	CheckEmailAvailability(request dto.CheckEmailRequest) (bool, error)
 	SaveAvatar(id int, fileLocation string) (entity.User, error)
+	GetUserByID(userID int) (entity.User, error)
 }
 
 type userService struct {
@@ -92,4 +93,15 @@ func (s *userService) SaveAvatar(id int, fileLocation string) (entity.User, erro
 		return user, err
 	}
 	return updatedUser, nil
+}
+
+func (s *userService) GetUserByID(userID int) (entity.User, error) {
+	user, err := s.userRepository.FindByID(userID)
+	if err != nil {
+		return user, err
+	}
+	if user.ID == 0 {
+		return user, errors.New("No user with the correspond ID")
+	}
+	return user, nil
 }

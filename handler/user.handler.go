@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-fundraising/dto"
+	"go-fundraising/entity"
 	"go-fundraising/helper"
 	"go-fundraising/service"
 	"net/http"
@@ -119,7 +120,8 @@ func (h *userHandler) UploadAvatar(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	userID := 1
+	user := ctx.MustGet("user").(entity.User)
+	userID := user.ID
 	destination := fmt.Sprintf("images/avatars/%d-%s", userID, file.Filename)
 	err = ctx.SaveUploadedFile(file, destination)
 	if err != nil {
@@ -128,7 +130,7 @@ func (h *userHandler) UploadAvatar(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	_, err = h.userService.SaveAvatar(16, destination)
+	_, err = h.userService.SaveAvatar(int(userID), destination)
 	data := gin.H{"is_uploaded": true}
 	response := helper.APIResponse("Avatar uploaded successfully", http.StatusOK, "success", data)
 	ctx.JSON(http.StatusOK, response)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
+	"go-fundraising/middlewares"
 	"go-fundraising/repository"
 	"go-fundraising/service"
 	"log"
@@ -49,7 +50,7 @@ func main() {
 		userRouter.POST("/register", userHandler.RegisterUser)
 		userRouter.POST("/login", userHandler.LoginUser)
 		userRouter.POST("/check-email", userHandler.CheckEmailAvaibility)
-		userRouter.POST("/avatars", userHandler.UploadAvatar)
+		userRouter.POST("/avatars", middlewares.AuthorizeToken(jwtService, userService), userHandler.UploadAvatar)
 
 	}
 	router.Run(":5000")
