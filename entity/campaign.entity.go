@@ -13,6 +13,7 @@ type Campaign struct {
 	GoalAmount       int    `gorm:"bigint"`
 	CurrentAmount    int    `gorm:"bigint"`
 	Slug             string `gorm:"type:varchar(100)"`
+	CampaignImages   []CampaignImage
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 }

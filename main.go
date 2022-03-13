@@ -37,6 +37,7 @@ func main() {
 	db.AutoMigrate(&entity.User{}, &entity.Campaign{}, &entity.CampaignImage{})
 
 	userRepository := repository.NewUserRepository(db)
+	campaignRepository := repository.NewCampaignRepository(db)
 
 	jwtService := service.NewJWTService()
 	userService := service.NewUserService(userRepository)
