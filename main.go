@@ -41,8 +41,14 @@ func main() {
 
 	jwtService := service.NewJWTService()
 	userService := service.NewUserService(userRepository)
+	campaignService := service.NewCampaignService(campaignRepository)
 
 	userHandler := handler.NewUserHandler(userService, jwtService)
+
+	campaigns, err := campaignService.FindCampaigns(16)
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+	}
 
 	router := gin.Default()
 
