@@ -44,11 +44,7 @@ func main() {
 	campaignService := service.NewCampaignService(campaignRepository)
 
 	userHandler := handler.NewUserHandler(userService, jwtService)
-
-	campaigns, err := campaignService.FindCampaigns(16)
-	for _, campaign := range campaigns {
-		fmt.Println(campaign.Name)
-	}
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	router := gin.Default()
 
@@ -59,6 +55,11 @@ func main() {
 		userRouter.POST("/check-email", userHandler.CheckEmailAvaibility)
 		userRouter.POST("/avatars", middlewares.AuthorizeToken(jwtService, userService), userHandler.UploadAvatar)
 
+	}
+
+	campaignRouter := router.Group("/api/v1/campaigns")
+	{
+		campaignRouter.GET("/", campaignHandler.GetCampaigns)
 	}
 	router.Run(":5000")
 }

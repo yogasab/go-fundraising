@@ -6,7 +6,7 @@ import (
 )
 
 type CampaignService interface {
-	FindCampaigns(userID int) ([]entity.Campaign, error)
+	GetCampaigns(userID int) ([]entity.Campaign, error)
 }
 
 type campaignService struct {
@@ -17,7 +17,7 @@ func NewCampaignService(campaignRepository repository.CampaignRepository) Campai
 	return &campaignService{campaignRepository: campaignRepository}
 }
 
-func (s *campaignService) FindCampaigns(userID int) ([]entity.Campaign, error) {
+func (s *campaignService) GetCampaigns(userID int) ([]entity.Campaign, error) {
 	if userID != 0 {
 		campaigns, err := s.campaignRepository.FindCampaignByUserID(userID)
 		if err != nil {
