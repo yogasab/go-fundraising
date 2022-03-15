@@ -49,12 +49,25 @@ func main() {
 	router := gin.Default()
 	router.Static("/images/avatar", "./images/avatars")
 
-	//request := dto.CampaignGetRequestSlug{Slug: "campaign-1"}
-	//campaign, err := campaignService.GetCampaignBySlug(request)
-	//if err != nil {
-	//	fmt.Println(err.Error())
+	//userRequest, _ := userService.GetUserByID(16)
+	//fmt.Println(userRequest)
+	//request := dto.CreateCampaignRequest{
+	//	Name:             "Campaign 3",
+	//	ShortDescription: "Short description",
+	//	Description:      "Longgggg descriptionnnnnnn",
+	//	GoalAmount:       0,
+	//	Perks:            "Benefit 1, benefit 2, benefit 3",
+	//	User:             userRequest,
 	//}
+	//campaign, err := campaignService.CreateCampaign(request)
+	//if err != nil {
+	//	fmt.Println("===========================")
+	//	fmt.Println(err.Error())
+	//	fmt.Println("===========================")
+	//}
+	//fmt.Println("===========================")
 	//fmt.Println(campaign)
+	//fmt.Println("===========================")
 
 	userRouter := router.Group("/api/v1/users")
 	{
@@ -68,6 +81,9 @@ func main() {
 	campaignRouter := router.Group("/api/v1/campaigns")
 	{
 		campaignRouter.GET("/", campaignHandler.GetCampaigns)
+		campaignRouter.POST("/",
+			middlewares.AuthorizeToken(jwtService, userService),
+			campaignHandler.CreateCampaign)
 		campaignRouter.GET("/:id", campaignHandler.GetCampaignByID)
 		//campaignRouter.GET("/:slug", campaignHandler.GetCampaignBySlug)
 	}

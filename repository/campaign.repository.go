@@ -10,6 +10,7 @@ type CampaignRepository interface {
 	FindAll() ([]entity.Campaign, error)
 	FindCampaignByID(id int) (entity.Campaign, error)
 	FindCampaignBySlug(slug string) (entity.Campaign, error)
+	Save(campaign entity.Campaign) (entity.Campaign, error)
 }
 
 type campaignRepository struct {
@@ -65,6 +66,14 @@ func (r *campaignRepository) FindCampaignBySlug(slug string) (entity.Campaign, e
 		Preload("CampaignImages").
 		Where("slug = ?", slug).
 		Find(&campaign).Error
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, nil
+}
+
+func (r *campaignRepository) Save(campaign entity.Campaign) (entity.Campaign, error) {
+	err := r.connection.Save(&campaign).Error
 	if err != nil {
 		return campaign, err
 	}
