@@ -8,6 +8,8 @@ import (
 type CampaignRepository interface {
 	FindCampaignByUserID(userID int) ([]entity.Campaign, error)
 	FindAll() ([]entity.Campaign, error)
+	FindCampaignByID(id int) (entity.Campaign, error)
+	FindCampaignBySlug(slug string) (entity.Campaign, error)
 }
 
 type campaignRepository struct {
@@ -41,4 +43,30 @@ func (r *campaignRepository) FindAll() ([]entity.Campaign, error) {
 		return campaigns, err
 	}
 	return campaigns, nil
+}
+
+func (r *campaignRepository) FindCampaignByID(id int) (entity.Campaign, error) {
+	var campaign entity.Campaign
+	err := r.connection.
+		Preload("User").
+		Preload("CampaignImages").
+		Where("id = ?", id).
+		Find(&campaign).Error
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, nil
+}
+
+func (r *campaignRepository) FindCampaignBySlug(slug string) (entity.Campaign, error) {
+	var campaign entity.Campaign
+	err := r.connection.
+		Preload("User").
+		Preload("CampaignImages").
+		Where("slug = ?", slug).
+		Find(&campaign).Error
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, nil
 }

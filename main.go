@@ -49,6 +49,13 @@ func main() {
 	router := gin.Default()
 	router.Static("/images/avatar", "./images/avatars")
 
+	//request := dto.CampaignGetRequestSlug{Slug: "campaign-1"}
+	//campaign, err := campaignService.GetCampaignBySlug(request)
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//}
+	//fmt.Println(campaign)
+
 	userRouter := router.Group("/api/v1/users")
 	{
 		userRouter.POST("/register", userHandler.RegisterUser)
@@ -61,6 +68,8 @@ func main() {
 	campaignRouter := router.Group("/api/v1/campaigns")
 	{
 		campaignRouter.GET("/", campaignHandler.GetCampaigns)
+		campaignRouter.GET("/:id", campaignHandler.GetCampaignByID)
+		//campaignRouter.GET("/:slug", campaignHandler.GetCampaignBySlug)
 	}
 	router.Run(":5000")
 }

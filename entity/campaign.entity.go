@@ -1,6 +1,8 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 type Campaign struct {
 	ID               int             `gorm:"primaryKey:auto_increment" json:"id"`
@@ -14,6 +16,7 @@ type Campaign struct {
 	CurrentAmount    int             `gorm:"bigint" json:"current_amount"`
 	Slug             string          `gorm:"type:varchar(100)" json:"slug"`
 	CampaignImages   []CampaignImage `json:"campaign_images"`
+	User             User            `json:"user"`
 	CreatedAt        time.Time       `json:"created_at"`
 	UpdatedAt        time.Time       `json:"updated_at"`
 }

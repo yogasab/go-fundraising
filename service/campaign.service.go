@@ -1,12 +1,15 @@
 package service
 
 import (
+	"go-fundraising/dto"
 	"go-fundraising/entity"
 	"go-fundraising/repository"
 )
 
 type CampaignService interface {
 	GetCampaigns(userID int) ([]entity.Campaign, error)
+	GetCampaignByID(request dto.CampaignGetRequestID) (entity.Campaign, error)
+	GetCampaignBySlug(request dto.CampaignGetRequestSlug) (entity.Campaign, error)
 }
 
 type campaignService struct {
@@ -30,4 +33,19 @@ func (s *campaignService) GetCampaigns(userID int) ([]entity.Campaign, error) {
 		return campaigns, err
 	}
 	return campaigns, nil
+}
+
+func (s *campaignService) GetCampaignByID(request dto.CampaignGetRequestID) (entity.Campaign, error) {
+	campaign, err := s.campaignRepository.FindCampaignByID(request.ID)
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, nil
+}
+func (s *campaignService) GetCampaignBySlug(request dto.CampaignGetRequestSlug) (entity.Campaign, error) {
+	campaign, err := s.campaignRepository.FindCampaignBySlug(request.Slug)
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, nil
 }

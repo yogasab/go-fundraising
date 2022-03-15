@@ -3,6 +3,7 @@ package helper
 import (
 	"github.com/go-playground/validator/v10"
 	"go-fundraising/entity"
+	"strings"
 )
 
 type UserFormatter struct {
@@ -22,6 +23,31 @@ type CampaignFormatter struct {
 	GoalAmount       int    `json:"goal_amount"`
 	CurrentAmount    int    `json:"current_amount"`
 	Slug             string `json:"slug"`
+}
+
+type CampaignDetailFormatter struct {
+	ID               int                            `json:"id"`
+	Name             string                         `json:"name"`
+	ShortDescription string                         `json:"short_description"`
+	Description      string                         `json:"description"`
+	ImageURL         string                         `json:"image_url"`
+	GoalAmount       int                            `json:"goal_amount"`
+	CurrentAmount    int                            `json:"current_amount"`
+	UserID           int                            `json:"user_id"`
+	Slug             string                         `json:"slug"`
+	Perks            []string                       `json:"perks"`
+	User             CampaignDetailUserFormatter    `json:"user"`
+	Images           []CampaignDetailImageFormatter `json:"images"`
+}
+
+type CampaignDetailUserFormatter struct {
+	Name     string `json:"name"`
+	ImageURL string `json:"image_url"`
+}
+
+type CampaignDetailImageFormatter struct {
+	ImageURL  string `json:"image_url"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 func FormatUser(user entity.User, token string) UserFormatter {
@@ -66,4 +92,45 @@ func FormatValidationErrors(err error) []string {
 		errors = append(errors, e.Error())
 	}
 	return errors
+}
+
+func FormatCampaignDetail(campaign entity.Campaign) CampaignDetailFormatter {
+	campaignDetailFormatter := CampaignDetailFormatter{}
+	campaignDetailFormatter.ID = campaign.ID
+	campaignDetailFormatter.UserID = campaign.UserId
+	campaignDetailFormatter.Name = campaign.Name
+	campaignDetailFormatter.ShortDescription = campaign.ShortDescription
+	campaignDetailFormatter.Description = campaign.Description
+	campaignDetailFormatter.ImageURL = ""
+	if len(campaign.CampaignImages) > 0 {
+		campaignDetailFormatter.ImageURL = campaign.CampaignImages[0].FileName
+	}
+	var perks []string
+	for _, perk := range strings.Split(campaign.Perks, ",") {
+		perks = append(perks, strings.TrimSpace(perk))
+	}
+	campaignDetailFormatter.Perks = perks
+
+	// CampaignDetailUserFormatter
+	user := campaign.User
+	campaignDetailUserFormatter := CampaignDetailUserFormatter{}
+	campaignDetailUserFormatter.Name = user.Name
+	campaignDetailUserFormatter.ImageURL = user.AvatarFileName
+	campaignDetailFormatter.User = campaignDetailUserFormatter
+
+	// CampaignDetailImageFormatter
+	images := []CampaignDetailImageFormatter{}
+	for _, image := range campaign.CampaignImages {
+		campaignDetailImageFormatter := CampaignDetailImageFormatter{}
+		campaignDetailImageFormatter.ImageURL = image.FileName
+		isPrimary := false
+		if image.IsPrimary == 1 {
+			isPrimary = true
+		}
+		campaignDetailImageFormatter.IsPrimary = isPrimary
+		images = append(images, campaignDetailImageFormatter)
+	}
+	campaignDetailFormatter.Images = images
+
+	return campaignDetailFormatter
 }
