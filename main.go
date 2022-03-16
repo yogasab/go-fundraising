@@ -49,26 +49,6 @@ func main() {
 	router := gin.Default()
 	router.Static("/images/avatar", "./images/avatars")
 
-	//userRequest, _ := userService.GetUserByID(16)
-	//fmt.Println(userRequest)
-	//request := dto.CreateCampaignRequest{
-	//	Name:             "Campaign 3",
-	//	ShortDescription: "Short description",
-	//	Description:      "Longgggg descriptionnnnnnn",
-	//	GoalAmount:       0,
-	//	Perks:            "Benefit 1, benefit 2, benefit 3",
-	//	User:             userRequest,
-	//}
-	//campaign, err := campaignService.CreateCampaign(request)
-	//if err != nil {
-	//	fmt.Println("===========================")
-	//	fmt.Println(err.Error())
-	//	fmt.Println("===========================")
-	//}
-	//fmt.Println("===========================")
-	//fmt.Println(campaign)
-	//fmt.Println("===========================")
-
 	userRouter := router.Group("/api/v1/users")
 	{
 		userRouter.POST("/register", userHandler.RegisterUser)
@@ -85,6 +65,7 @@ func main() {
 			middlewares.AuthorizeToken(jwtService, userService),
 			campaignHandler.CreateCampaign)
 		campaignRouter.GET("/:id", campaignHandler.GetCampaignByID)
+		campaignRouter.PUT("/:id", middlewares.AuthorizeToken(jwtService, userService), campaignHandler.UpdateCampaign)
 		//campaignRouter.GET("/:slug", campaignHandler.GetCampaignBySlug)
 	}
 	router.Run(":5000")

@@ -15,6 +15,7 @@ type CampaignHandler interface {
 	GetCampaignByID(ctx *gin.Context)
 	GetCampaignBySlug(ctx *gin.Context)
 	CreateCampaign(ctx *gin.Context)
+	UpdateCampaign(ctx *gin.Context)
 }
 
 type campaignHandler struct {
@@ -96,4 +97,34 @@ func (h *campaignHandler) CreateCampaign(ctx *gin.Context) {
 	}
 	response := helper.APIResponse("Campaign created successfully", http.StatusCreated, "success", helper.FormatCampaign(newCampaign))
 	ctx.JSON(http.StatusCreated, response)
+}
+
+func (h *campaignHandler) UpdateCampaign(ctx *gin.Context) {
+	var requestID dto.CampaignGetRequestID
+	err := ctx.ShouldBindUri(&requestID)
+	if err != nil {
+		response := helper.APIResponse("Failed to process request", http.StatusBadRequest, "failed", err.Error())
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var requestCampaign dto.CreateCampaignRequest
+	err = ctx.ShouldBindJSON(&requestCampaign)
+	if err != nil {
+		errors := helper.FormatValidationErrors(err)
+		errorMessage := gin.H{"errors": errors}
+		response := helper.APIResponse("Failed to process request", http.StatusBadRequest, "failed", errorMessage)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	user := ctx.MustGet("user").(entity.User)
+	requestCampaign.User = user
+	campaign, err := h.campaignService.UpdateCampaign(requestID, requestCampaign)
+	if err != nil {
+		response := helper.APIResponse("Failed to process request", http.StatusBadRequest, "failed", err.Error())
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helper.APIResponse("Campaign updated successfully", http.StatusOK, "success", campaign)
+	ctx.JSON(http.StatusOK, response)
 }

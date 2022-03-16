@@ -1,7 +1,7 @@
 package dto
 
 type CampaignGetRequestID struct {
-	ID int `uri:"id" binding:"required"`
+	ID int `uri:"id"`
 }
 
 type CampaignGetRequestSlug struct {

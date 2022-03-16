@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gosimple/slug"
 	"go-fundraising/dto"
@@ -13,6 +14,7 @@ type CampaignService interface {
 	GetCampaignByID(request dto.CampaignGetRequestID) (entity.Campaign, error)
 	GetCampaignBySlug(request dto.CampaignGetRequestSlug) (entity.Campaign, error)
 	CreateCampaign(request dto.CreateCampaignRequest) (entity.Campaign, error)
+	UpdateCampaign(requestID dto.CampaignGetRequestID, requestCampaign dto.CreateCampaignRequest) (entity.Campaign, error)
 }
 
 type campaignService struct {
@@ -70,4 +72,25 @@ func (s *campaignService) CreateCampaign(request dto.CreateCampaignRequest) (ent
 		return newCampaign, err
 	}
 	return newCampaign, nil
+}
+
+func (s *campaignService) UpdateCampaign(requestID dto.CampaignGetRequestID, requestCampaign dto.CreateCampaignRequest) (entity.Campaign, error) {
+	campaign, err := s.campaignRepository.FindCampaignByID(requestID.ID)
+	if err != nil {
+		return campaign, err
+	}
+	if campaign.UserId != int(requestCampaign.User.ID) {
+		return campaign, errors.New("You are not be able to perform this route")
+	}
+	campaign.Name = requestCampaign.Name
+	campaign.ShortDescription = requestCampaign.ShortDescription
+	campaign.Description = requestCampaign.Description
+	campaign.GoalAmount = requestCampaign.GoalAmount
+	campaign.Perks = requestCampaign.Perks
+
+	updatedCampaign, err := s.campaignRepository.Update(campaign)
+	if err != nil {
+		return updatedCampaign, err
+	}
+	return updatedCampaign, nil
 }
