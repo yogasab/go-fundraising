@@ -2,18 +2,17 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
 	"go-fundraising/middlewares"
 	"go-fundraising/repository"
 	"go-fundraising/service"
-	"log"
-	"os"
-
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
+	"os"
 )
 
 func main() {
@@ -67,6 +66,13 @@ func main() {
 		campaignRouter.GET("/:id", campaignHandler.GetCampaignByID)
 		campaignRouter.PUT("/:id", middlewares.AuthorizeToken(jwtService, userService), campaignHandler.UpdateCampaign)
 		//campaignRouter.GET("/:slug", campaignHandler.GetCampaignBySlug)
+	}
+
+	campaignImageRouter := router.Group("/api/v1/campaigns-images")
+	{
+		campaignImageRouter.POST("/",
+			middlewares.AuthorizeToken(jwtService, userService),
+			campaignHandler.UploadCampaignImage)
 	}
 	router.Run(":5000")
 }

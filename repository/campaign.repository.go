@@ -12,6 +12,8 @@ type CampaignRepository interface {
 	FindCampaignBySlug(slug string) (entity.Campaign, error)
 	Save(campaign entity.Campaign) (entity.Campaign, error)
 	Update(campaign entity.Campaign) (entity.Campaign, error)
+	CreateImage(campaignImage entity.CampaignImage) (entity.CampaignImage, error)
+	MarkAllImagesAsNonPrimary(campaignID int) (bool, error)
 }
 
 type campaignRepository struct {
@@ -87,4 +89,22 @@ func (r *campaignRepository) Update(campaign entity.Campaign) (entity.Campaign, 
 		return campaign, err
 	}
 	return campaign, nil
+}
+
+func (r *campaignRepository) CreateImage(campaignImage entity.CampaignImage) (entity.CampaignImage, error) {
+	err := r.connection.Create(&campaignImage).Error
+	if err != nil {
+		return campaignImage, err
+	}
+	return campaignImage, nil
+}
+
+func (r *campaignRepository) MarkAllImagesAsNonPrimary(campaignID int) (bool, error) {
+	err := r.connection.Model(&entity.CampaignImage{}).
+		Where("campaign_id = ?", campaignID).
+		Update("is_primary", 0).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }

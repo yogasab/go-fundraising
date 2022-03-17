@@ -15,6 +15,7 @@ type CampaignService interface {
 	GetCampaignBySlug(request dto.CampaignGetRequestSlug) (entity.Campaign, error)
 	CreateCampaign(request dto.CreateCampaignRequest) (entity.Campaign, error)
 	UpdateCampaign(requestID dto.CampaignGetRequestID, requestCampaign dto.CreateCampaignRequest) (entity.Campaign, error)
+	CreateCampaignImage(request dto.CreateCampaignImageRequest, fileLocation string) (entity.CampaignImage, error)
 }
 
 type campaignService struct {
@@ -93,4 +94,35 @@ func (s *campaignService) UpdateCampaign(requestID dto.CampaignGetRequestID, req
 		return updatedCampaign, err
 	}
 	return updatedCampaign, nil
+}
+
+func (s *campaignService) CreateCampaignImage(request dto.CreateCampaignImageRequest, filename string) (entity.CampaignImage, error) {
+	campaign, err := s.campaignRepository.FindCampaignByID(request.CampaignID)
+	if err != nil {
+		return entity.CampaignImage{}, err
+	}
+	if campaign.UserId != int(request.User.ID) {
+		fmt.Println(campaign.UserId)
+		fmt.Println(request.User.ID)
+		return entity.CampaignImage{}, errors.New("You are not be able to perform this route")
+	}
+
+	isPrimary := 0
+	if request.IsPrimary {
+		isPrimary = 1
+		_, err := s.campaignRepository.MarkAllImagesAsNonPrimary(request.CampaignID)
+		if err != nil {
+			return entity.CampaignImage{}, err
+		}
+	}
+	campaignImage := entity.CampaignImage{}
+	campaignImage.CampaignID = request.CampaignID
+	campaignImage.FileName = filename
+	campaignImage.IsPrimary = isPrimary
+
+	newCampaignImage, err := s.campaignRepository.CreateImage(campaignImage)
+	if err != nil {
+		return newCampaignImage, err
+	}
+	return newCampaignImage, nil
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-fundraising/dto"
 	"go-fundraising/entity"
@@ -16,6 +17,7 @@ type CampaignHandler interface {
 	GetCampaignBySlug(ctx *gin.Context)
 	CreateCampaign(ctx *gin.Context)
 	UpdateCampaign(ctx *gin.Context)
+	UploadCampaignImage(ctx *gin.Context)
 }
 
 type campaignHandler struct {
@@ -127,4 +129,47 @@ func (h *campaignHandler) UpdateCampaign(ctx *gin.Context) {
 	}
 	response := helper.APIResponse("Campaign updated successfully", http.StatusOK, "success", campaign)
 	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *campaignHandler) UploadCampaignImage(ctx *gin.Context) {
+	var request dto.CreateCampaignImageRequest
+	err := ctx.ShouldBind(&request)
+	if err != nil {
+		errors := helper.FormatValidationErrors(err)
+		errorMessage := gin.H{"errors": errors}
+		response := helper.APIResponse("Failed to process request", http.StatusUnprocessableEntity, "failed", errorMessage)
+		ctx.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	user := ctx.MustGet("user").(entity.User)
+	request.User = user
+	userID := int(user.ID)
+	file, err := ctx.FormFile("campaign_image")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "failed", data)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	filename := fmt.Sprintf("images/campaigns/%d-%s", userID, file.Filename)
+	err = ctx.SaveUploadedFile(file, filename)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "failed", data)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.campaignService.CreateCampaignImage(request, filename)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload campaign image", http.StatusBadRequest, "failed", data)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	data := gin.H{"is_uploaded": true}
+	response := helper.APIResponse("Campaign image uploaded successfully", http.StatusCreated, "success", data)
+	ctx.JSON(http.StatusCreated, response)
 }
