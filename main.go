@@ -33,17 +33,20 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 	fmt.Println("Database connected")
-	db.AutoMigrate(&entity.User{}, &entity.Campaign{}, &entity.CampaignImage{})
+	db.AutoMigrate(&entity.User{}, &entity.Campaign{}, &entity.CampaignImage{}, &entity.Transaction{})
 
 	userRepository := repository.NewUserRepository(db)
 	campaignRepository := repository.NewCampaignRepository(db)
+	transactionRepository := repository.NewTransactionRepository(db)
 
 	jwtService := service.NewJWTService()
 	userService := service.NewUserService(userRepository)
 	campaignService := service.NewCampaignService(campaignRepository)
+	transactionService := service.NewTransactionService(transactionRepository, campaignRepository)
 
 	userHandler := handler.NewUserHandler(userService, jwtService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
 	router.Static("/images/avatar", "./images/avatars")
@@ -73,6 +76,13 @@ func main() {
 		campaignImageRouter.POST("/",
 			middlewares.AuthorizeToken(jwtService, userService),
 			campaignHandler.UploadCampaignImage)
+	}
+
+	transactionRouter := router.Group("/api/v1/campaigns")
+	{
+		transactionRouter.GET("/:id/transactions",
+			middlewares.AuthorizeToken(jwtService, userService),
+			transactionHandler.GetTransactionsByCampaignID)
 	}
 	router.Run(":5000")
 }

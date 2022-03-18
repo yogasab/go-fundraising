@@ -4,6 +4,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go-fundraising/entity"
 	"strings"
+	"time"
 )
 
 type UserFormatter struct {
@@ -48,6 +49,13 @@ type CampaignDetailUserFormatter struct {
 type CampaignDetailImageFormatter struct {
 	ImageURL  string `json:"image_url"`
 	IsPrimary bool   `json:"is_primary"`
+}
+
+type CampaignTransactionFormatter struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Amount    int       `json:"amount"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func FormatUser(user entity.User, token string) UserFormatter {
@@ -133,4 +141,24 @@ func FormatCampaignDetail(campaign entity.Campaign) CampaignDetailFormatter {
 	campaignDetailFormatter.Images = images
 
 	return campaignDetailFormatter
+}
+
+func FormatCampaignTransaction(transaction entity.Transaction) CampaignTransactionFormatter {
+	formatter := CampaignTransactionFormatter{}
+	formatter.ID = transaction.ID
+	formatter.Name = transaction.User.Name
+	formatter.Amount = transaction.Amount
+	formatter.CreatedAt = transaction.CreatedAt
+	return formatter
+}
+func FormatCampaignTransactions(transactions []entity.Transaction) []CampaignTransactionFormatter {
+	if len(transactions) == 0 {
+		return []CampaignTransactionFormatter{}
+	}
+	var transactionsFormatter []CampaignTransactionFormatter
+	for _, transaction := range transactions {
+		transactionFormatter := FormatCampaignTransaction(transaction)
+		transactionsFormatter = append(transactionsFormatter, transactionFormatter)
+	}
+	return transactionsFormatter
 }
