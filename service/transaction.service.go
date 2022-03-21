@@ -9,6 +9,7 @@ import (
 
 type TransactionService interface {
 	GetTransactionsByCampaignID(request dto.TransactionGetRequestID) ([]entity.Transaction, error)
+	GetTransactionsByUserID(userID int) ([]entity.Transaction, error)
 }
 
 type transactionService struct {
@@ -35,6 +36,14 @@ func (s *transactionService) GetTransactionsByCampaignID(request dto.Transaction
 	}
 
 	transactions, err := s.transactionRepository.GetByCampaignID(request.ID)
+	if err != nil {
+		return transactions, err
+	}
+	return transactions, nil
+}
+
+func (s *transactionService) GetTransactionsByUserID(userID int) ([]entity.Transaction, error) {
+	transactions, err := s.transactionRepository.GetByUserID(userID)
 	if err != nil {
 		return transactions, err
 	}

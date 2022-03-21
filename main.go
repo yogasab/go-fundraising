@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
 	"go-fundraising/middlewares"
 	"go-fundraising/repository"
 	"go-fundraising/service"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -83,6 +84,13 @@ func main() {
 		transactionRouter.GET("/:id/transactions",
 			middlewares.AuthorizeToken(jwtService, userService),
 			transactionHandler.GetTransactionsByCampaignID)
+	}
+
+	transactionUserRouter := router.Group("/api/v1/transactions")
+	{
+		transactionUserRouter.GET("/",
+			middlewares.AuthorizeToken(jwtService, userService),
+			transactionHandler.GetTransactionsByUserID)
 	}
 	router.Run(":5000")
 }

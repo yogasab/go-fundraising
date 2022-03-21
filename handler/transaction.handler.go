@@ -1,16 +1,19 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"go-fundraising/dto"
 	"go-fundraising/entity"
 	"go-fundraising/helper"
 	"go-fundraising/service"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type TransactionHandler interface {
 	GetTransactionsByCampaignID(ctx *gin.Context)
+	GetTransactionsByUserID(ctx *gin.Context)
 }
 
 type transactionHandler struct {
@@ -41,5 +44,19 @@ func (h *transactionHandler) GetTransactionsByCampaignID(ctx *gin.Context) {
 		return
 	}
 	response := helper.APIResponse("Transactions fetched successfully", http.StatusOK, "success", helper.FormatCampaignTransactions(transactions))
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *transactionHandler) GetTransactionsByUserID(ctx *gin.Context) {
+	user := ctx.MustGet("user").(entity.User)
+	fmt.Println(user)
+	userID := user.ID
+	transactions, err := h.transactionService.GetTransactionsByUserID(int(userID))
+	if err != nil {
+		response := helper.APIResponse("Failed to process request", http.StatusBadRequest, "failed", nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helper.APIResponse("Transactions fetched succesfully", http.StatusOK, "success", helper.FormatUserTransactions(transactions))
 	ctx.JSON(http.StatusOK, response)
 }

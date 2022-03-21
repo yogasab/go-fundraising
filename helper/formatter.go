@@ -1,10 +1,11 @@
 package helper
 
 import (
-	"github.com/go-playground/validator/v10"
 	"go-fundraising/entity"
 	"strings"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type UserFormatter struct {
@@ -56,6 +57,32 @@ type CampaignTransactionFormatter struct {
 	Name      string    `json:"name"`
 	Amount    int       `json:"amount"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+// type UserTransactionFormatter struct {
+// 	ID        int                   `json:"id"`
+// 	Amount    int                   `json:"amount"`
+// 	Status    string                `json:"name"`
+// 	CreatedAt time.Time             `json:"created_at"`
+// 	Campaign  UserCampaignFormatter `json:"campaign"`
+// }
+
+// type UserCampaignFormatter struct {
+// 	Name     string `json:"name"`
+// 	ImageURL string `json:"image_url"`
+// }
+
+type UserTransactionFormatter struct {
+	ID        int                   `json:"id"`
+	Amount    int                   `json:"amount"`
+	Status    string                `json:"status"`
+	CreatedAt time.Time             `json:"created_at"`
+	Campaign  UserCampaignFormatter `json:"campaign"`
+}
+
+type UserCampaignFormatter struct {
+	Name     string `json::"name"`
+	ImageURL string `json:"image_url"`
 }
 
 func FormatUser(user entity.User, token string) UserFormatter {
@@ -151,6 +178,7 @@ func FormatCampaignTransaction(transaction entity.Transaction) CampaignTransacti
 	formatter.CreatedAt = transaction.CreatedAt
 	return formatter
 }
+
 func FormatCampaignTransactions(transactions []entity.Transaction) []CampaignTransactionFormatter {
 	if len(transactions) == 0 {
 		return []CampaignTransactionFormatter{}
@@ -161,4 +189,65 @@ func FormatCampaignTransactions(transactions []entity.Transaction) []CampaignTra
 		transactionsFormatter = append(transactionsFormatter, transactionFormatter)
 	}
 	return transactionsFormatter
+}
+
+// func FormatUserTransaction(transaction entity.Transaction) UserTransactionFormatter {
+// 	formatter := UserTransactionFormatter{}
+// 	formatter.ID = transaction.ID
+// 	formatter.Amount = transaction.Amount
+// 	formatter.Status = transaction.Status
+// 	formatter.CreatedAt = transaction.CreatedAt
+
+// 	campaignFormatter := UserCampaignFormatter{}
+// 	campaignFormatter.Name = transaction.User.Name
+// 	campaignFormatter.ImageURL = ""
+// 	if len(transaction.Campaign.CampaignImages) > 0 {
+// 		campaignFormatter.ImageURL = transaction.Campaign.CampaignImages[0].FileName
+// 	}
+// 	formatter.Campaign = campaignFormatter
+// 	return formatter
+// }
+
+// func FormatUserTransactions(transactions []entity.Transaction) []UserTransactionFormatter {
+// 	if len(transactions) == 0 {
+// 		return []UserTransactionFormatter{}
+// 	}
+// 	var userTransactionFormatter []UserTransactionFormatter
+// 	for _, transaction := range transactions {
+// 		formatter := FormatUserTransaction(transaction)
+// 		userTransactionFormatter = append(userTransactionFormatter, formatter)
+// 	}
+// 	return userTransactionFormatter
+// }
+
+func FormatUserTransaction(transaction entity.Transaction) UserTransactionFormatter {
+	formatter := UserTransactionFormatter{}
+	formatter.ID = transaction.ID
+	formatter.Amount = transaction.Amount
+	formatter.Status = transaction.Status
+	formatter.CreatedAt = transaction.CreatedAt
+
+	campaignFormatter := UserCampaignFormatter{}
+	campaignFormatter.Name = transaction.User.Name
+	campaignFormatter.ImageURL = ""
+	if len(transaction.Campaign.CampaignImages) > 0 {
+		campaignFormatter.ImageURL = transaction.Campaign.CampaignImages[0].FileName
+	}
+	formatter.Campaign = campaignFormatter
+
+	return formatter
+}
+
+func FormatUserTransactions(transactions []entity.Transaction) []UserTransactionFormatter {
+	if len(transactions) == 0 {
+		return []UserTransactionFormatter{}
+	}
+
+	var userTransactionFormatter []UserTransactionFormatter
+	for _, transaction := range transactions {
+		formatter := FormatUserTransaction(transaction)
+		userTransactionFormatter = append(userTransactionFormatter, formatter)
+	}
+
+	return userTransactionFormatter
 }
