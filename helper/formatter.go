@@ -59,19 +59,6 @@ type CampaignTransactionFormatter struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// type UserTransactionFormatter struct {
-// 	ID        int                   `json:"id"`
-// 	Amount    int                   `json:"amount"`
-// 	Status    string                `json:"name"`
-// 	CreatedAt time.Time             `json:"created_at"`
-// 	Campaign  UserCampaignFormatter `json:"campaign"`
-// }
-
-// type UserCampaignFormatter struct {
-// 	Name     string `json:"name"`
-// 	ImageURL string `json:"image_url"`
-// }
-
 type UserTransactionFormatter struct {
 	ID        int                   `json:"id"`
 	Amount    int                   `json:"amount"`
@@ -190,35 +177,6 @@ func FormatCampaignTransactions(transactions []entity.Transaction) []CampaignTra
 	}
 	return transactionsFormatter
 }
-
-// func FormatUserTransaction(transaction entity.Transaction) UserTransactionFormatter {
-// 	formatter := UserTransactionFormatter{}
-// 	formatter.ID = transaction.ID
-// 	formatter.Amount = transaction.Amount
-// 	formatter.Status = transaction.Status
-// 	formatter.CreatedAt = transaction.CreatedAt
-
-// 	campaignFormatter := UserCampaignFormatter{}
-// 	campaignFormatter.Name = transaction.User.Name
-// 	campaignFormatter.ImageURL = ""
-// 	if len(transaction.Campaign.CampaignImages) > 0 {
-// 		campaignFormatter.ImageURL = transaction.Campaign.CampaignImages[0].FileName
-// 	}
-// 	formatter.Campaign = campaignFormatter
-// 	return formatter
-// }
-
-// func FormatUserTransactions(transactions []entity.Transaction) []UserTransactionFormatter {
-// 	if len(transactions) == 0 {
-// 		return []UserTransactionFormatter{}
-// 	}
-// 	var userTransactionFormatter []UserTransactionFormatter
-// 	for _, transaction := range transactions {
-// 		formatter := FormatUserTransaction(transaction)
-// 		userTransactionFormatter = append(userTransactionFormatter, formatter)
-// 	}
-// 	return userTransactionFormatter
-// }
 
 func FormatUserTransaction(transaction entity.Transaction) UserTransactionFormatter {
 	formatter := UserTransactionFormatter{}

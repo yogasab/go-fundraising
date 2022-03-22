@@ -2,14 +2,17 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"go-fundraising/dto"
 	"go-fundraising/entity"
 	"go-fundraising/repository"
+	"math/rand"
 )
 
 type TransactionService interface {
 	GetTransactionsByCampaignID(request dto.TransactionGetRequestID) ([]entity.Transaction, error)
 	GetTransactionsByUserID(userID int) ([]entity.Transaction, error)
+	CreateTransaction(request dto.TransactionCreateRequest) (entity.Transaction, error)
 }
 
 type transactionService struct {
@@ -48,4 +51,18 @@ func (s *transactionService) GetTransactionsByUserID(userID int) ([]entity.Trans
 		return transactions, err
 	}
 	return transactions, nil
+}
+
+func (s *transactionService) CreateTransaction(request dto.TransactionCreateRequest) (entity.Transaction, error) {
+	transaction := entity.Transaction{}
+	transaction.CampaignID = request.CampaignID
+	transaction.Amount = request.Amount
+	transaction.UserID = int(request.User.ID)
+	transaction.Status = "pending"
+	transaction.Code = fmt.Sprintf("TRX-%d", rand.Intn(100000))
+	newTransaction, err := s.transactionRepository.Save(transaction)
+	if err != nil {
+		return newTransaction, err
+	}
+	return newTransaction, nil
 }

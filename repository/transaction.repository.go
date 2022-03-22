@@ -2,12 +2,14 @@ package repository
 
 import (
 	"go-fundraising/entity"
+
 	"gorm.io/gorm"
 )
 
 type TransactionRepository interface {
 	GetByCampaignID(campaignID int) ([]entity.Transaction, error)
 	GetByUserID(userID int) ([]entity.Transaction, error)
+	Save(transaction entity.Transaction) (entity.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -44,4 +46,12 @@ func (r *transactionRepository) GetByUserID(userID int) ([]entity.Transaction, e
 		return transactions, err
 	}
 	return transactions, nil
+}
+
+func (r *transactionRepository) Save(transaction entity.Transaction) (entity.Transaction, error) {
+	err := r.connection.Create(&transaction).Error
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
 }
