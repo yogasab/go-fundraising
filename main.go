@@ -91,6 +91,9 @@ func main() {
 		transactionUserRouter.GET("/",
 			middlewares.AuthorizeToken(jwtService, userService),
 			transactionHandler.GetTransactionsByUserID)
+		transactionUserRouter.POST("/",
+			middlewares.AuthorizeToken(jwtService, userService),
+			transactionHandler.CreateTransaction)
 	}
 	router.Run(":5000")
 }
