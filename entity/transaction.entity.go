@@ -10,6 +10,7 @@ type Transaction struct {
 	Status     string
 	Code       string
 	User       User
+	PaymentURL string
 	Campaign   Campaign
 	CreatedAt  time.Time
 	UpdatedAt  time.Time

@@ -18,12 +18,14 @@ type TransactionService interface {
 type transactionService struct {
 	transactionRepository repository.TransactionRepository
 	campaignRepository    repository.CampaignRepository
+	paymentService        PaymentService
 }
 
-func NewTransactionService(transactionRepository repository.TransactionRepository, campaignRepository repository.CampaignRepository) TransactionService {
+func NewTransactionService(transactionRepository repository.TransactionRepository, campaignRepository repository.CampaignRepository, paymentService PaymentService) TransactionService {
 	return &transactionService{
 		transactionRepository: transactionRepository,
 		campaignRepository:    campaignRepository,
+		paymentService:        paymentService,
 	}
 }
 
@@ -64,5 +66,16 @@ func (s *transactionService) CreateTransaction(request dto.TransactionCreateRequ
 	if err != nil {
 		return newTransaction, err
 	}
+
+	paymentURL, err := s.paymentService.GetPaymentURL(request.User, newTransaction)
+	if err != nil {
+		return newTransaction, err
+	}
+	newTransaction.PaymentURL = paymentURL
+	newTransaction, err = s.transactionRepository.Update(newTransaction)
+	if err != nil {
+		return newTransaction, err
+	}
+
 	return newTransaction, nil
 }

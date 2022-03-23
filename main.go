@@ -43,7 +43,8 @@ func main() {
 	jwtService := service.NewJWTService()
 	userService := service.NewUserService(userRepository)
 	campaignService := service.NewCampaignService(campaignRepository)
-	transactionService := service.NewTransactionService(transactionRepository, campaignRepository)
+	paymentService := service.NewPaymentService()
+	transactionService := service.NewTransactionService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, jwtService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)

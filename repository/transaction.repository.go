@@ -10,6 +10,7 @@ type TransactionRepository interface {
 	GetByCampaignID(campaignID int) ([]entity.Transaction, error)
 	GetByUserID(userID int) ([]entity.Transaction, error)
 	Save(transaction entity.Transaction) (entity.Transaction, error)
+	Update(transaction entity.Transaction) (entity.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -50,6 +51,14 @@ func (r *transactionRepository) GetByUserID(userID int) ([]entity.Transaction, e
 
 func (r *transactionRepository) Save(transaction entity.Transaction) (entity.Transaction, error) {
 	err := r.connection.Create(&transaction).Error
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
+}
+
+func (r *transactionRepository) Update(transaction entity.Transaction) (entity.Transaction, error) {
+	err := r.connection.Save(&transaction).Error
 	if err != nil {
 		return transaction, err
 	}
