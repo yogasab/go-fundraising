@@ -15,6 +15,7 @@ type UserHandler interface {
 	LoginUser(ctx *gin.Context)
 	CheckEmailAvaibility(ctx *gin.Context)
 	UploadAvatar(ctx *gin.Context)
+	MyProfile(ctx *gin.Context)
 }
 
 type userHandler struct {
@@ -133,5 +134,12 @@ func (h *userHandler) UploadAvatar(ctx *gin.Context) {
 	_, err = h.userService.SaveAvatar(int(userID), destination)
 	data := gin.H{"is_uploaded": true}
 	response := helper.APIResponse("Avatar uploaded successfully", http.StatusOK, "success", data)
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) MyProfile(ctx *gin.Context) {
+	user := ctx.MustGet("user").(entity.User)
+	userFormatter := helper.FormatUser(user, "")
+	response := helper.APIResponse("Profile fetched successfully", http.StatusOK, "success", userFormatter)
 	ctx.JSON(http.StatusOK, response)
 }

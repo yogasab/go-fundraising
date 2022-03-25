@@ -63,7 +63,7 @@ func main() {
 		userRouter.POST("/login", userHandler.LoginUser)
 		userRouter.POST("/check-email", userHandler.CheckEmailAvaibility)
 		userRouter.POST("/avatars", middlewares.AuthorizeToken(jwtService, userService), userHandler.UploadAvatar)
-
+		userRouter.GET("/profile", middlewares.AuthorizeToken(jwtService, userService), userHandler.MyProfile)
 	}
 
 	campaignRouter := router.Group("/api/v1/campaigns")
