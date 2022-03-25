@@ -72,6 +72,15 @@ type UserCampaignFormatter struct {
 	ImageURL string `json:"image_url"`
 }
 
+type TransactionFormatter struct {
+	ID         int    `json:"id"`
+	CampaignID int    `json:"campaign_id"`
+	UserID     int    `json:"user_id"`
+	Amount     int    `json:"amount"`
+	Code       string `json:"code"`
+	PaymentURL string `json:"payment_url"`
+}
+
 func FormatUser(user entity.User, token string) UserFormatter {
 	userFormatter := UserFormatter{
 		ID:         user.ID,
@@ -208,4 +217,15 @@ func FormatUserTransactions(transactions []entity.Transaction) []UserTransaction
 	}
 
 	return userTransactionFormatter
+}
+
+func FormatTransaction(transaction entity.Transaction) TransactionFormatter {
+	formatter := TransactionFormatter{}
+	formatter.ID = transaction.ID
+	formatter.CampaignID = transaction.CampaignID
+	formatter.UserID = transaction.UserID
+	formatter.Amount = transaction.Amount
+	formatter.Code = transaction.Code
+	formatter.PaymentURL = transaction.PaymentURL
+	return formatter
 }

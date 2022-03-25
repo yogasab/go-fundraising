@@ -7,12 +7,14 @@ import (
 	"go-fundraising/entity"
 	"go-fundraising/repository"
 	"math/rand"
+	"strconv"
 )
 
 type TransactionService interface {
 	GetTransactionsByCampaignID(request dto.TransactionGetRequestID) ([]entity.Transaction, error)
 	GetTransactionsByUserID(userID int) ([]entity.Transaction, error)
 	CreateTransaction(request dto.TransactionCreateRequest) (entity.Transaction, error)
+	ProcessPayment(request dto.TransactionNotificationRequest) error
 }
 
 type transactionService struct {
@@ -78,4 +80,39 @@ func (s *transactionService) CreateTransaction(request dto.TransactionCreateRequ
 	}
 
 	return newTransaction, nil
+}
+
+func (s *transactionService) ProcessPayment(request dto.TransactionNotificationRequest) error {
+	transaction_id, _ := strconv.Atoi(request.OrderID)
+	transaction, err := s.transactionRepository.GetByID(transaction_id)
+	if err != nil {
+		return err
+	}
+
+	if request.PaymentType == "credit_card" && request.TransactionStatus == "capture" && request.FraudStatus == "accept" {
+		transaction.Status = "paid"
+	} else if request.TransactionStatus == "settlement" {
+		transaction.Status = "paid"
+	} else if request.TransactionStatus == "deny" || request.TransactionStatus == "expire" || request.TransactionStatus == "cancel" {
+		transaction.Status = "cancelled"
+	}
+
+	updatedTransaction, err := s.transactionRepository.Update(transaction)
+	if err != nil {
+		return err
+	}
+	campaign, err := s.campaignRepository.FindCampaignByID(updatedTransaction.CampaignID)
+	if err != nil {
+		return err
+	}
+	if updatedTransaction.Status == "paid" {
+		campaign.BackerCount = campaign.BackerCount + 1
+		campaign.CurrentAmount = campaign.CurrentAmount + updatedTransaction.Amount
+		_, err = s.campaignRepository.Update(campaign)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
