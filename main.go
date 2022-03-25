@@ -30,6 +30,9 @@ func main() {
 	DB_PORT := os.Getenv("DB_PORT")
 	DB_NAME := os.Getenv("DB_NAME")
 	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		PORT = "8000"
+	}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
