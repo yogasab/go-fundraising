@@ -15,6 +15,7 @@ type TransactionHandler interface {
 	GetTransactionsByCampaignID(ctx *gin.Context)
 	GetTransactionsByUserID(ctx *gin.Context)
 	CreateTransaction(ctx *gin.Context)
+	GetNotification(ctx *gin.Context)
 }
 
 type transactionHandler struct {
@@ -84,4 +85,21 @@ func (h *transactionHandler) CreateTransaction(ctx *gin.Context) {
 		http.StatusCreated, "success",
 		helper.FormatTransaction(transaction))
 	ctx.JSON(http.StatusCreated, response)
+}
+
+func (h *transactionHandler) GetNotification(ctx *gin.Context) {
+	var request dto.TransactionNotificationRequest
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		response := helper.APIResponse("Failed to process request", http.StatusBadRequest, "failed", nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	err = h.transactionService.ProcessPayment(request)
+	if err != nil {
+		response := helper.APIResponse(err.Error(), http.StatusBadRequest, "failed", nil)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
+	}
+	ctx.JSON(http.StatusOK, request)
 }

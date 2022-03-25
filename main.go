@@ -53,6 +53,8 @@ func main() {
 	router := gin.Default()
 	router.Static("/images/avatar", "./images/avatars")
 
+	router.POST("/midtrans/callback", transactionHandler.GetNotification)
+
 	userRouter := router.Group("/api/v1/users")
 	{
 		userRouter.POST("/register", userHandler.RegisterUser)

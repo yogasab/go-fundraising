@@ -96,7 +96,6 @@ func (s *transactionService) ProcessPayment(request dto.TransactionNotificationR
 	} else if request.TransactionStatus == "deny" || request.TransactionStatus == "expire" || request.TransactionStatus == "cancel" {
 		transaction.Status = "cancelled"
 	}
-
 	updatedTransaction, err := s.transactionRepository.Update(transaction)
 	if err != nil {
 		return err
