@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
 	"go-fundraising/middlewares"
@@ -51,6 +52,7 @@ func main() {
 	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Static("/images/avatar", "./images/avatars")
 
 	router.POST("/midtrans/callback", transactionHandler.GetNotification)
