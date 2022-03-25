@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-contrib/cors"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
 	"go-fundraising/middlewares"
@@ -10,6 +9,8 @@ import (
 	"go-fundraising/service"
 	"log"
 	"os"
+
+	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -27,6 +28,7 @@ func main() {
 	DB_USER := os.Getenv("DB_USER")
 	DB_PORT := os.Getenv("DB_PORT")
 	DB_NAME := os.Getenv("DB_NAME")
+	PORT := os.Getenv("PORT")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
@@ -100,5 +102,5 @@ func main() {
 			middlewares.AuthorizeToken(jwtService, userService),
 			transactionHandler.CreateTransaction)
 	}
-	router.Run(":5000")
+	router.Run(":" + PORT)
 }
