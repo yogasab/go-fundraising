@@ -14,27 +14,27 @@ import (
 	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-	errEnv := godotenv.Load()
-	if errEnv != nil {
-		log.Fatalln("Error while loading env file")
-	}
-	DB_HOST := os.Getenv("DB_HOST")
-	DB_PASSWORD := os.Getenv("DB_PASSWORD")
-	DB_USER := os.Getenv("DB_USER")
-	DB_PORT := os.Getenv("DB_PORT")
-	DB_NAME := os.Getenv("DB_NAME")
+	// errEnv := godotenv.Load()
+	// if errEnv != nil {
+	// 	log.Fatalln("Error while loading env file")
+	// }
+	// DB_HOST := os.Getenv("DB_HOST")
+	// DB_PASSWORD := os.Getenv("DB_PASSWORD")
+	// DB_USER := os.Getenv("DB_USER")
+	// DB_PORT := os.Getenv("DB_PORT")
+	// DB_NAME := os.Getenv("DB_NAME")
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "8000"
 	}
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
+	dsn := fmt.Sprintf("host=localhost user=postgres password=postgres port=5432 dbname=go-fundraising TimeZone=Asia/Shanghai")
+	// dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
