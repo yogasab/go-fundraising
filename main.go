@@ -8,6 +8,7 @@ import (
 	"go-fundraising/repository"
 	"go-fundraising/service"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gin-contrib/cors"
@@ -55,6 +56,11 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.Default())
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Home",
+		})
+	})
 	router.Static("/images/avatar", "./images/avatars")
 
 	router.POST("/midtrans/callback", transactionHandler.GetNotification)
