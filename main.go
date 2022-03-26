@@ -2,39 +2,37 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/multitemplate"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
 	"go-fundraising/middlewares"
 	"go-fundraising/repository"
 	"go-fundraising/service"
+	webHandler "go-fundraising/web/handler"
 	"log"
-	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-	// errEnv := godotenv.Load()
-	// if errEnv != nil {
-	// 	log.Fatalln("Error while loading env file")
-	// }
-	// DB_HOST := os.Getenv("DB_HOST")
-	// DB_PASSWORD := os.Getenv("DB_PASSWORD")
-	// DB_USER := os.Getenv("DB_USER")
-	// DB_PORT := os.Getenv("DB_PORT")
-	// DB_NAME := os.Getenv("DB_NAME")
-	PORT := os.Getenv("PORT")
-	if PORT == "" {
-		PORT = "8000"
+	errEnv := godotenv.Load()
+	if errEnv != nil {
+		log.Fatalln("Error while loading env file")
 	}
+	DB_HOST := os.Getenv("DB_HOST")
+	DB_PASSWORD := os.Getenv("DB_PASSWORD")
+	DB_USER := os.Getenv("DB_USER")
+	DB_PORT := os.Getenv("DB_PORT")
+	DB_NAME := os.Getenv("DB_NAME")
 
-	dsn := fmt.Sprintf("host=localhost user=postgres password=postgres port=5432 dbname=go-fundraising TimeZone=Asia/Shanghai")
-	// dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -56,15 +54,13 @@ func main() {
 	userHandler := handler.NewUserHandler(userService, jwtService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
+	userWebHandler := webHandler.NewUserHandler()
 
 	router := gin.Default()
 	router.Use(cors.Default())
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Home",
-		})
-	})
 	router.Static("/images/avatar", "./images/avatars")
+	// Multiple template render HTML
+	router.HTMLRender = loadTemplates("./web/templates")
 
 	router.POST("/midtrans/callback", transactionHandler.GetNotification)
 
@@ -111,5 +107,31 @@ func main() {
 			middlewares.AuthorizeToken(jwtService, userService),
 			transactionHandler.CreateTransaction)
 	}
-	router.Run(":" + PORT)
+
+	userWebRouter := router.Group("/users")
+	{
+		userWebRouter.GET("/", userWebHandler.Index)
+	}
+	router.Run(":5000")
+}
+
+func loadTemplates(templatesDir string) multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
+	// Load template from all the files inside layouts folder
+	layouts, err := filepath.Glob(templatesDir + "/layouts/*")
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	// Load template from all the files/folders inside templates folder
+	includes, err := filepath.Glob(templatesDir + "/**/*")
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	for _, include := range includes {
+		layoutCopy := make([]string, len(layouts))
+		copy(layoutCopy, layouts)
+		files := append(layoutCopy, include)
+		r.AddFromFiles(filepath.Base(include), files...)
+	}
+	return r
 }
