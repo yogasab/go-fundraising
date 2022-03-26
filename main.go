@@ -54,11 +54,14 @@ func main() {
 	userHandler := handler.NewUserHandler(userService, jwtService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
-	userWebHandler := webHandler.NewUserHandler()
+	userWebHandler := webHandler.NewUserHandler(userService)
 
 	router := gin.Default()
 	router.Use(cors.Default())
 	router.Static("/images/avatar", "./images/avatars")
+	router.Static("/css", "./web/assets/css")
+	router.Static("/js", "./web/assets/js")
+	router.Static("/webfonts", "./web/assets/webfonts")
 	// Multiple template render HTML
 	router.HTMLRender = loadTemplates("./web/templates")
 

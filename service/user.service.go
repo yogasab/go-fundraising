@@ -15,6 +15,7 @@ type UserService interface {
 	CheckEmailAvailability(request dto.CheckEmailRequest) (bool, error)
 	SaveAvatar(id int, fileLocation string) (entity.User, error)
 	GetUserByID(userID int) (entity.User, error)
+	GetAllUsers() ([]entity.User, error)
 }
 
 type userService struct {
@@ -104,4 +105,12 @@ func (s *userService) GetUserByID(userID int) (entity.User, error) {
 		return user, errors.New("No user with the correspond ID")
 	}
 	return user, nil
+}
+
+func (s *userService) GetAllUsers() ([]entity.User, error) {
+	users, err := s.userRepository.FindAll()
+	if err != nil {
+		return users, err
+	}
+	return users, nil
 }

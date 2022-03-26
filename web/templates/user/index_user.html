@@ -1,3 +1,29 @@
 {{ define "content" }}
-    List of users
+    <h2 class="mb-4 font-weight-bold">List of users</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table mb-4">
+                <thead class="thead-light">
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Occupation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .users }}
+                        <tr>
+                            <td><img src="{{ .AvatarFileName }}" class="img-fluid" alt="{{ .Name }}"></td>
+                            <td>{{ .Name }}</td>
+                            <td>{{ .Email }}</td>
+                            <td>{{ .Occupation }}</td>
+                        </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 {{ end }}
