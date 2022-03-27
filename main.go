@@ -114,6 +114,8 @@ func main() {
 	userWebRouter := router.Group("/users")
 	{
 		userWebRouter.GET("/", userWebHandler.Index)
+		userWebRouter.GET("/add", userWebHandler.Add)
+		userWebRouter.POST("/store", userWebHandler.Store)
 	}
 	router.Run(":5000")
 }

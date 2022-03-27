@@ -1,0 +1,40 @@
+{{ define "content" }}
+
+<h3 class="font-weight-bold">Add new user</h3>
+
+{{ if .Error }}
+    <div class="alert alert-danger alert-dismissible">{{ .Error }}</div>
+{{ end }}
+
+<div class="card">
+    <div class="card-body font-weight-bold">
+        <form action="/users/store" method="post">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control" id="name" placeholder="Enter name" value="{{ .Name }}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" class="form-control" id="email" placeholder="Enter email" value="{{ .Email }}">
+            </div>
+            <div class="form-group">
+                <label for="occupation">Occupation</label>
+                <select name="occupation" class="form-control" id="occupation">
+                    <option>Choose an occupation</option>
+                    <option>Engineer</option>
+                    <option>Architect</option>
+                    <option>Musician</option>
+                    <option>Software Engineer</option>
+                    <option>Journalist</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" class="form-control" id="password" placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+{{ end }}
