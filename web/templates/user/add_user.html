@@ -19,14 +19,7 @@
             </div>
             <div class="form-group">
                 <label for="occupation">Occupation</label>
-                <select name="occupation" class="form-control" id="occupation">
-                    <option>Choose an occupation</option>
-                    <option>Engineer</option>
-                    <option>Architect</option>
-                    <option>Musician</option>
-                    <option>Software Engineer</option>
-                    <option>Journalist</option>
-                </select>
+                <input type="text" name="occupation" class="form-control" id="occupation" placeholder="Enter occupation" value="{{ .Occupation }}">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>

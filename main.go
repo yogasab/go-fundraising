@@ -116,6 +116,9 @@ func main() {
 		userWebRouter.GET("/", userWebHandler.Index)
 		userWebRouter.GET("/add", userWebHandler.Add)
 		userWebRouter.POST("/store", userWebHandler.Store)
+		userWebRouter.GET("/edit/:id", userWebHandler.Edit)
+		userWebRouter.POST("/update/:id", userWebHandler.Update)
+		userWebRouter.POST("/delete/:id", userWebHandler.Delete)
 	}
 	router.Run(":5000")
 }

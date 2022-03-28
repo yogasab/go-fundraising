@@ -16,6 +16,8 @@ type UserService interface {
 	SaveAvatar(id int, fileLocation string) (entity.User, error)
 	GetUserByID(userID int) (entity.User, error)
 	GetAllUsers() ([]entity.User, error)
+	UpdateUser(request dto.FormUpdateUserRequest) (entity.User, error)
+	DeleteUser(id int) error
 }
 
 type userService struct {
@@ -113,4 +115,29 @@ func (s *userService) GetAllUsers() ([]entity.User, error) {
 		return users, err
 	}
 	return users, nil
+}
+
+func (s *userService) UpdateUser(request dto.FormUpdateUserRequest) (entity.User, error) {
+	user, err := s.userRepository.FindByID(request.ID)
+	if err != nil {
+		return user, err
+	}
+
+	user.Name = request.Name
+	user.Occupation = request.Occupation
+	user.Email = request.Email
+	updatedUser, err := s.userRepository.Update(user)
+
+	if err != nil {
+		return updatedUser, err
+	}
+	return updatedUser, nil
+}
+
+func (s *userService) DeleteUser(id int) error {
+	err := s.userRepository.Delete(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

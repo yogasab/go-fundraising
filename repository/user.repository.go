@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindByID(id int) (entity.User, error)
 	Update(user entity.User) (entity.User, error)
 	FindAll() ([]entity.User, error)
+	Delete(id int) error
 }
 
 type userRepository struct {
@@ -68,4 +69,13 @@ func (r *userRepository) FindAll() ([]entity.User, error) {
 		return users, err
 	}
 	return users, nil
+}
+
+func (r *userRepository) Delete(id int) error {
+	var user entity.User
+	err := r.db.Where("id = ?", id).Delete(&user).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

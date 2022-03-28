@@ -1,0 +1,31 @@
+{{ define "content" }}
+
+<h3 class="font-weight-bold">Edit user</h3>
+
+{{ if .Error }}
+    <div class="alert alert-danger alert-dismissible">
+        {{ .Error }}
+    </div>
+{{ end }}
+
+<div class="card">
+    <div class="card-body font-weight-bold">
+        <form action="/users/update/{{ .ID }}" method="post">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control" id="name" placeholder="Enter name" value="{{ .Name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" class="form-control" id="email" placeholder="Enter email" value="{{ .Email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="occupation">Occupation</label>
+                <input type="text" name="occupation" class="form-control" id="occupation" placeholder="Enter occupation" value="{{ .Occupation }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+{{ end }}
