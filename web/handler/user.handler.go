@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-fundraising/dto"
 	"go-fundraising/service"
@@ -15,6 +16,8 @@ type UserHandler interface {
 	Edit(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+	UploadAvatar(ctx *gin.Context)
+	StoreAvatar(ctx *gin.Context)
 }
 
 type userHandler struct {
@@ -102,6 +105,38 @@ func (h *userHandler) Delete(ctx *gin.Context) {
 	err := h.userService.DeleteUser(id)
 	if err != nil {
 		ctx.HTML(http.StatusFound, "index_user.html", nil)
+		return
+	}
+	ctx.Redirect(http.StatusFound, "/users")
+}
+
+func (h *userHandler) UploadAvatar(ctx *gin.Context) {
+	userId := ctx.Param("id")
+	id, _ := strconv.Atoi(userId)
+	ctx.HTML(http.StatusFound, "avatar_user.html", gin.H{"ID": id})
+}
+
+func (h *userHandler) StoreAvatar(ctx *gin.Context) {
+	userId := ctx.Param("id")
+	userID, _ := strconv.Atoi(userId)
+
+	file, err := ctx.FormFile("avatar")
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.HTML(http.StatusBadRequest, "error.html", nil)
+		return
+	}
+	destination := fmt.Sprintf("images/avatars/%d-%s", userID, file.Filename)
+	err = ctx.SaveUploadedFile(file, destination)
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.HTML(http.StatusBadRequest, "error.html", nil)
+		return
+	}
+	_, err = h.userService.SaveAvatar(userID, destination)
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.HTML(http.StatusBadRequest, "error.html", nil)
 		return
 	}
 	ctx.Redirect(http.StatusFound, "/users")

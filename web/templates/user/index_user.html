@@ -10,7 +10,7 @@
             <table class="table mb-4">
                 <thead class="thead-light">
                     <tr>
-                        <th></th>
+                        <th>Avatar</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Occupation</th>
@@ -20,14 +20,17 @@
                 <tbody>
                     {{ range .users }}
                         <tr>
-                            <td><img src="{{ .AvatarFileName }}" class="img-fluid" alt="{{ .Name }}"></td>
-                            <td>{{ .Name }}</td>
+                            <td><img class="img-fluid img-thumbnail" src="/{{ .AvatarFileName }}" width="60" alt="{{ .Name}}"></td>
                             <td>{{ .Email }}</td>
+                            <td>{{ .Name }}</td>
                             <td>{{ .Occupation }}</td>
                             <td>
                                 <form action="/users/delete/{{ .ID }}" method="post">
                                     <a href="/users/edit/{{ .ID }}" class="btn btn-sm btn-warning">
                                         <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a href="/users/avatar/{{ .ID }}" class="btn btn-sm btn-info">
+                                        <i class="fa fa-camera"></i>
                                     </a>
                                     <button type="submit" class="btn btn-sm btn-danger">
                                         <i class="fa fa-trash"></i>
