@@ -59,7 +59,7 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.Default())
-	router.Static("/images/avatars", "./images/avatars")
+	router.Static("/images", "./images")
 	router.Static("/css", "./web/assets/css")
 	router.Static("/js", "./web/assets/js")
 	router.Static("/webfonts", "./web/assets/webfonts")
@@ -129,6 +129,8 @@ func main() {
 		campaignWebRouter.GET("/", campaignWebHandler.Index)
 		campaignWebRouter.GET("/add", campaignWebHandler.Add)
 		campaignWebRouter.POST("/store", campaignWebHandler.Store)
+		campaignWebRouter.GET("/image/:id", campaignWebHandler.UploadImage)
+		campaignWebRouter.POST("/image/store/:id", campaignWebHandler.StoreImage)
 	}
 	router.Run(":5000")
 }
