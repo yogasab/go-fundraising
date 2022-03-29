@@ -15,6 +15,8 @@ type CampaignHandler interface {
 	Store(ctx *gin.Context)
 	UploadImage(ctx *gin.Context)
 	StoreImage(ctx *gin.Context)
+	Edit(ctx *gin.Context)
+	Update(ctx *gin.Context)
 }
 
 type campaignHandler struct {
@@ -93,7 +95,6 @@ func (h *campaignHandler) StoreImage(ctx *gin.Context) {
 	//	Take the file
 	file, err := ctx.FormFile("file")
 	if err != nil {
-		fmt.Println(err.Error())
 		ctx.HTML(http.StatusBadGateway, "error.html", nil)
 		return
 	}
@@ -103,7 +104,6 @@ func (h *campaignHandler) StoreImage(ctx *gin.Context) {
 	//	Query to get campaign by id
 	campaign, err := h.campaignService.GetCampaignByID(dto.CampaignGetRequestID{ID: campaignID})
 	if err != nil {
-		fmt.Println(err.Error())
 		ctx.HTML(http.StatusBadRequest, "error.html", nil)
 		return
 	}
@@ -112,7 +112,6 @@ func (h *campaignHandler) StoreImage(ctx *gin.Context) {
 	destination := fmt.Sprintf("images/%d-%s", userID, file.Filename)
 	err = ctx.SaveUploadedFile(file, destination)
 	if err != nil {
-		fmt.Println(err.Error())
 		ctx.HTML(http.StatusBadRequest, "error.html", nil)
 		return
 	}
@@ -121,13 +120,76 @@ func (h *campaignHandler) StoreImage(ctx *gin.Context) {
 	request.IsPrimary = true
 	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
-		fmt.Println(err.Error())
 		ctx.HTML(http.StatusBadRequest, "error.html", nil)
 		return
 	}
 	request.User = user
 	//	Take the save campaign image service
 	_, err = h.campaignService.CreateCampaignImage(request, destination)
+	if err != nil {
+		ctx.HTML(http.StatusBadRequest, "error.html", nil)
+		return
+	}
+	ctx.Redirect(http.StatusFound, "/campaigns")
+}
+
+func (h *campaignHandler) Edit(ctx *gin.Context) {
+	id := ctx.Param("id")
+	campaignID, _ := strconv.Atoi(id)
+	campaign, err := h.campaignService.GetCampaignByID(dto.CampaignGetRequestID{ID: campaignID})
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.HTML(http.StatusBadRequest, "error.html", nil)
+		return
+	}
+	request := dto.FormUpdateCampaignRequest{}
+	request.ID = campaignID
+	request.Name = campaign.Name
+	request.ShortDescription = campaign.ShortDescription
+	request.Description = campaign.Description
+	request.Perks = campaign.Perks
+	request.GoalAmount = campaign.GoalAmount
+	ctx.HTML(http.StatusOK, "edit_campaign.html", request)
+}
+
+func (h *campaignHandler) Update(ctx *gin.Context) {
+	// 	Take the campaign id param
+	id := ctx.Param("id")
+	campaignID, _ := strconv.Atoi(id)
+	//	Declare the update request and bind it
+	request := dto.FormUpdateCampaignRequest{}
+	err := ctx.ShouldBind(&request)
+	if err != nil {
+		fmt.Println(err.Error())
+		request.ID = campaignID
+		request.Error = err
+		ctx.HTML(http.StatusInternalServerError, "error.html", request)
+		return
+	}
+	//	Query campaign by id
+	campaign, err := h.campaignService.GetCampaignByID(dto.CampaignGetRequestID{ID: campaignID})
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.HTML(http.StatusInternalServerError, "error.html", nil)
+		return
+	}
+	userID := campaign.UserId
+	// Query user who owns campaign by user id
+	user, err := h.userService.GetUserByID(userID)
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.HTML(http.StatusBadRequest, "error.html", nil)
+		return
+	}
+	// Mapping the request from update campaign
+	formUpdateCampaign := dto.CreateCampaignRequest{}
+	formUpdateCampaign.Name = request.Name
+	formUpdateCampaign.Perks = request.Perks
+	formUpdateCampaign.GoalAmount = request.GoalAmount
+	formUpdateCampaign.Description = request.Description
+	formUpdateCampaign.ShortDescription = request.ShortDescription
+	formUpdateCampaign.User = user
+	_, err = h.campaignService.UpdateCampaign(dto.CampaignGetRequestID{ID: campaignID}, formUpdateCampaign)
 	if err != nil {
 		fmt.Println(err.Error())
 		ctx.HTML(http.StatusBadRequest, "error.html", nil)

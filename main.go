@@ -131,6 +131,8 @@ func main() {
 		campaignWebRouter.POST("/store", campaignWebHandler.Store)
 		campaignWebRouter.GET("/image/:id", campaignWebHandler.UploadImage)
 		campaignWebRouter.POST("/image/store/:id", campaignWebHandler.StoreImage)
+		campaignWebRouter.GET("/edit/:id", campaignWebHandler.Edit)
+		campaignWebRouter.POST("/update/:id", campaignWebHandler.Update)
 	}
 	router.Run(":5000")
 }
