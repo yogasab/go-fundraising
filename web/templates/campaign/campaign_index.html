@@ -1,0 +1,51 @@
+{{ define "content" }}
+<h2 class="mb-4 font-weight-bold">List of campaigns</h2>
+<div class="card">
+    <div class="card-header">
+        <a href="/campaigns/add" class="btn btn-info font-weight-bold">
+            <i class="fa fa-plus mr-2"></i>Add new campaign
+        </a>
+    </div>
+    <div class="card-body">
+        <table class="table mb-4">
+            <thead class="thead-light">
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Goal Amount</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ range .campaigns }}
+            <tr>
+                <td>
+                    {{ if .CampaignImages }}
+                        <img width="60" src="/{{ (index .CampaignImages 0).FileName }}" class="img-fluid img-thumbnail">
+                    {{ end }}
+                </td>
+                <td>{{ .Name }}</td>
+                <td>{{ .ShortDescription }}</td>
+                <td>{{ .FormatGoalAmountIDR }}</td>
+                <td>
+<!--                    <form action="/users/delete/{{ .ID }}" method="post">-->
+                        <a href="/users/edit/{{ .ID }}" class="btn btn-sm btn-warning">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a href="/users/avatar/{{ .ID }}" class="btn btn-sm btn-info">
+                            <i class="fa fa-camera"></i>
+                        </a>
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="fa fa-trash"></i>
+                        </button>
+<!--                    </form>-->
+                </td>
+            </tr>
+            {{ end }}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ end }}

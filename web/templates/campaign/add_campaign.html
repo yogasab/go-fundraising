@@ -1,0 +1,50 @@
+{{ define "content" }}
+
+<h3 class="font-weight-bold">Add new campaign</h3>
+
+{{ if .Error }}
+    <div class="alert alert-danger alert-dismissible">{{ .Error }}</div>
+{{ end }}
+
+<div class="card">
+    <div class="card-body font-weight-bold">
+        <form action="/campaigns/store" method="post">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <select name="user_id" id="user_id" class="form-control">
+                    <option>-- SELECT USER --</option>
+                    {{ range .Users }}
+                        {{ if eq .ID $.UserID }}
+                            <option value="{{ .ID }}" selected>{{ .Name }}</option>
+                        {{ else }}
+                            <option value="{{ .ID }}">{{ .Name }}</option>
+                        {{ end }}
+                    {{ end }}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control" id="name" placeholder="Enter name" value="{{ .Name }}">
+            </div>
+            <div class="form-group">
+                <label for="short_description">Short Description</label>
+                <input type="text" name="short_description" class="form-control" id="short_description" placeholder="Enter short description" value="{{ .ShortDescription }}">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea type="text" name="description" class="form-control" id="description" placeholder="Enter description" >{{ .Description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="goal_amount">Goal Amount</label>
+                <input type="number" name="goal_amount" class="form-control" id="goal_amount" placeholder="Enter goal amount" value="{{ .GoalAmount }}">
+            </div>
+            <div class="form-group">
+                <label for="perks">Perks</label>
+                <input type="text" name="perks" class="form-control" id="perks" placeholder="Enter perks (comma separated)" value="{{ .Perks }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+{{ end }}

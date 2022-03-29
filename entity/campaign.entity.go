@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/leekchan/accounting"
 	"time"
 )
 
@@ -19,6 +20,11 @@ type Campaign struct {
 	User             User            `json:"user"`
 	CreatedAt        time.Time       `json:"created_at"`
 	UpdatedAt        time.Time       `json:"updated_at"`
+}
+
+func (campaign Campaign) FormatGoalAmountIDR() string {
+	acc := accounting.Accounting{Symbol: "Rp", Precision: 2, Thousand: ".", Decimal: ","}
+	return acc.FormatMoney(campaign.GoalAmount)
 }
 
 type CampaignImage struct {
