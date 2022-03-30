@@ -1,0 +1,31 @@
+{{ define "content" }}
+<h2 class="mb-4 font-weight-bold">List of transactions</h2>
+<div class="card">
+<!--    <div class="card-header">-->
+<!--        <a href="/campaigns/add" class="btn btn-info font-weight-bold">-->
+<!--            <i class="fa fa-plus mr-2"></i>Add new campaign-->
+<!--        </a>-->
+<!--    </div>-->
+    <div class="card-body">
+        <table class="table mb-4">
+            <thead class="thead-light">
+            <tr>
+                <th>Campaign Name</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+                {{ range .transactions }}
+                <tr>
+                    <td>{{ .Campaign.Name }}</td>
+                    <td>{{ .Amount }}</td>
+                    <td>{{ .Status }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{ end }}

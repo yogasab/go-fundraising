@@ -12,6 +12,7 @@ type TransactionRepository interface {
 	GetByID(ID int) (entity.Transaction, error)
 	Save(transaction entity.Transaction) (entity.Transaction, error)
 	Update(transaction entity.Transaction) (entity.Transaction, error)
+	GetAllTransactions() ([]entity.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -73,4 +74,13 @@ func (r *transactionRepository) GetByID(ID int) (entity.Transaction, error) {
 		return transaction, err
 	}
 	return transaction, nil
+}
+
+func (r *transactionRepository) GetAllTransactions() ([]entity.Transaction, error) {
+	transactions := []entity.Transaction{}
+	err := r.connection.Preload("Campaign").Order("id desc").Find(&transactions).Error
+	if err != nil {
+		return transactions, err
+	}
+	return transactions, nil
 }

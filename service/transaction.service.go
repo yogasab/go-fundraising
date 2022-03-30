@@ -15,6 +15,7 @@ type TransactionService interface {
 	GetTransactionsByUserID(userID int) ([]entity.Transaction, error)
 	CreateTransaction(request dto.TransactionCreateRequest) (entity.Transaction, error)
 	ProcessPayment(request dto.TransactionNotificationRequest) error
+	GetAllTransactions() ([]entity.Transaction, error)
 }
 
 type transactionService struct {
@@ -114,4 +115,12 @@ func (s *transactionService) ProcessPayment(request dto.TransactionNotificationR
 	}
 
 	return nil
+}
+
+func (s *transactionService) GetAllTransactions() ([]entity.Transaction, error) {
+	transactions, err := s.transactionRepository.GetAllTransactions()
+	if err != nil {
+		return transactions, err
+	}
+	return transactions, nil
 }
