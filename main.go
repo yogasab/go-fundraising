@@ -133,6 +133,7 @@ func main() {
 		campaignWebRouter.POST("/image/store/:id", campaignWebHandler.StoreImage)
 		campaignWebRouter.GET("/edit/:id", campaignWebHandler.Edit)
 		campaignWebRouter.POST("/update/:id", campaignWebHandler.Update)
+		campaignWebRouter.GET("/show/:id", campaignWebHandler.Show)
 	}
 	router.Run(":5000")
 }

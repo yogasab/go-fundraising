@@ -17,6 +17,7 @@ type CampaignHandler interface {
 	StoreImage(ctx *gin.Context)
 	Edit(ctx *gin.Context)
 	Update(ctx *gin.Context)
+	Show(ctx *gin.Context)
 }
 
 type campaignHandler struct {
@@ -196,4 +197,19 @@ func (h *campaignHandler) Update(ctx *gin.Context) {
 		return
 	}
 	ctx.Redirect(http.StatusFound, "/campaigns")
+}
+
+func (h *campaignHandler) Show(ctx *gin.Context) {
+	id := ctx.Param("id")
+	campaignID, _ := strconv.Atoi(id)
+
+	request := dto.CampaignGetRequestID{}
+	request.ID = campaignID
+
+	campaign, err := h.campaignService.GetCampaignByID(request)
+	if err != nil {
+		ctx.Redirect(http.StatusInternalServerError, "/campaigns")
+		return
+	}
+	ctx.HTML(http.StatusOK, "show_campaign.html", campaign)
 }

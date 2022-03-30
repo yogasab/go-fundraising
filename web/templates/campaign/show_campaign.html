@@ -1,0 +1,35 @@
+{{ define "content" }}
+
+<h3 class="font-weight-bold m-2">{{ .Name }} Campaigns</h3>
+
+<div class="card">
+    <div class="card-body font-weight-bold">
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" class="form-control" id="name" placeholder="Enter name" value="{{ .Name }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="short_description">Short Description</label>
+                <input type="text" name="short_description" class="form-control" id="short_description" placeholder="Enter short description" value="{{ .ShortDescription }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea type="text" name="description" class="form-control" id="description" placeholder="Enter description" readonly>{{ .Description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="goal_amount">Goal Amount</label>
+                <input type="number" name="goal_amount" class="form-control" id="goal_amount" placeholder="Enter goal amount" value="{{ .GoalAmount }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="perks">Perks</label>
+                <input type="text" name="perks" class="form-control" id="perks" placeholder="Enter perks (comma separated)" value="{{ .Perks }}" readonly>
+            </div>
+            <a href="/campaigns" class="btn bg-secondary">
+                <i class="fa fa-arrow-left mr-2"></i>Back
+            </a>
+        </form>
+    </div>
+</div>
+
+{{ end }}
