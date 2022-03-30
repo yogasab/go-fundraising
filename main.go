@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gin-contrib/multitemplate"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"go-fundraising/entity"
 	"go-fundraising/handler"
 	"go-fundraising/middlewares"
@@ -31,6 +33,7 @@ func main() {
 	DB_USER := os.Getenv("DB_USER")
 	DB_PORT := os.Getenv("DB_PORT")
 	DB_NAME := os.Getenv("DB_NAME")
+	COOKIE_SECRET := os.Getenv("COOKIE_SECRET")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Shanghai", DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, DB_NAME)
 
@@ -60,6 +63,8 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.Default())
+	store := cookie.NewStore([]byte(COOKIE_SECRET))
+	router.Use(sessions.Sessions("routerSession", store))
 	router.Static("/images", "./images")
 	router.Static("/css", "./web/assets/css")
 	router.Static("/js", "./web/assets/js")
@@ -113,7 +118,7 @@ func main() {
 			transactionHandler.CreateTransaction)
 	}
 
-	userWebRouter := router.Group("/users")
+	userWebRouter := router.Group("/users", middlewares.AuthorizeAdmin())
 	{
 		userWebRouter.GET("/", userWebHandler.Index)
 		userWebRouter.GET("/add", userWebHandler.Add)
@@ -125,7 +130,7 @@ func main() {
 		userWebRouter.POST("/avatar/store/:id", userWebHandler.StoreAvatar)
 	}
 
-	campaignWebRouter := router.Group("/campaigns")
+	campaignWebRouter := router.Group("/campaigns", middlewares.AuthorizeAdmin())
 	{
 		campaignWebRouter.GET("/", campaignWebHandler.Index)
 		campaignWebRouter.GET("/add", campaignWebHandler.Add)
@@ -136,7 +141,7 @@ func main() {
 		campaignWebRouter.POST("/update/:id", campaignWebHandler.Update)
 		campaignWebRouter.GET("/show/:id", campaignWebHandler.Show)
 	}
-	transactionWebRouter := router.Group("/transactions")
+	transactionWebRouter := router.Group("/transactions", middlewares.AuthorizeAdmin())
 	{
 		transactionWebRouter.GET("/", transactionWebHandler.Index)
 	}
