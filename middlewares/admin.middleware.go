@@ -11,7 +11,7 @@ func AuthorizeAdmin() gin.HandlerFunc {
 		session := sessions.Default(c)
 		userID := session.Get("userID")
 		if userID == nil {
-			c.Redirect(http.StatusFound, "/login")
+			c.Redirect(http.StatusFound, "/auth/login")
 			return
 		}
 	}

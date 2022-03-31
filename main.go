@@ -12,6 +12,7 @@ import (
 	"go-fundraising/service"
 	webHandler "go-fundraising/web/handler"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -60,6 +61,7 @@ func main() {
 	userWebHandler := webHandler.NewUserHandler(userService)
 	campaignWebHandler := webHandler.NewCampaignHandler(campaignService, userService)
 	transactionWebHandler := webHandler.NewTransactionHandler(transactionService)
+	authenticationWebHandler := webHandler.NewAuthenticationHandler(userService)
 
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -72,6 +74,9 @@ func main() {
 	// Multiple template render HTML
 	router.HTMLRender = loadTemplates("./web/templates")
 
+	router.GET("/", middlewares.AuthorizeAdmin(), func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/admin/campaigns")
+	})
 	router.POST("/midtrans/callback", transactionHandler.GetNotification)
 
 	userRouter := router.Group("/api/v1/users")
@@ -144,6 +149,13 @@ func main() {
 	transactionWebRouter := router.Group("/transactions", middlewares.AuthorizeAdmin())
 	{
 		transactionWebRouter.GET("/", transactionWebHandler.Index)
+	}
+
+	authenticationWebRouter := router.Group("/auth")
+	{
+		authenticationWebRouter.GET("/login", authenticationWebHandler.LoginIndex)
+		authenticationWebRouter.POST("/login", authenticationWebHandler.LoginStore)
+		authenticationWebRouter.POST("/logout", authenticationWebHandler.Logout)
 	}
 	router.Run(":5000")
 }
